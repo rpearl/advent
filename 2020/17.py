@@ -16,39 +16,38 @@ def nosubmit(answer, part):
 
 # submit = nosubmit
 
-data = """.#.
-..#
-###"""
-
-# lines = data.splitlines()
-
 print(f"File line count: {len(lines)}")
+
+
+def deltas(dim):
+    z = (0,) * dim
+    return [delta for delta in itertools.product((-1, 0, 1), repeat=dim) if delta != z]
+
+
+dts = {3: deltas(3), 4: deltas(4)}
 
 
 @functools.cache
 def neighbors(pos):
     dim = len(pos)
-    return [
-        tuple(p + d for p, d in zip(pos, delta))
-        for delta in itertools.product((-1, 0, 1), repeat=dim)
-        if any(d != 0 for d in delta)
-    ]
+    return [tuple(map(sum, zip(pos, delta))) for delta in dts[dim]]
+
+
+initial = [
+    (x, y)
+    for y in range(len(lines))
+    for x in range(len(lines[0]))
+    if lines[y][x] == "#"
+]
 
 
 def run(n):
-    active = set()
-    for y in range(len(lines)):
-        for x in range(len(lines[0])):
-            pos = tuple([x, y] + [0] * (n - 2))
-            if lines[y][x] == "#":
-                active.add(pos)
+    active = {p + (0,) * (n - 2) for p in initial}
     for step in range(6):
-        counts = Counter()
-        for pos in active:
-            for npos in neighbors(pos):
-                counts[npos] += 1
         active = {
-            pos for pos, c in counts.items() if c == 3 or (c == 2 and pos in active)
+            pos
+            for pos, c in Counter(itertools.chain(*map(neighbors, active))).items()
+            if c == 3 or (c == 2 and pos in active)
         }
 
     return len(active)
