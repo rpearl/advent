@@ -1,4 +1,5 @@
-from aocd import data, submit
+# submit=True
+from aocd import data
 import u
 import itertools
 
@@ -14,21 +15,9 @@ def a():
 
 def b():
     for x, y in itertools.combinations(items, 2):
-            z = 2020 - x - y
-            if z in items:
-                return x * y * z
+        z = 2020 - x - y
+        if z in items:
+            return x * y * z
 
 
-def main():
-    ra = a()
-    if ra:
-        print(ra)
-        submit(ra, part="a")
-
-    rb = b()
-    if rb:
-        print(rb)
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

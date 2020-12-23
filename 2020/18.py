@@ -1,4 +1,5 @@
-from aocd import data, lines, submit
+submit = True
+from aocd import data, lines
 import sys
 from collections import Counter, defaultdict, deque
 import functools
@@ -10,23 +11,11 @@ import time
 import operator
 
 
-def nosubmit(answer, part):
-    pass
-
-
-submit = nosubmit
-
-print(f"File line count: {len(lines)}")
-
 ops = {
     "+": operator.add,
     "*": operator.mul,
     "-": operator.sub,
 }
-
-# data = """1 + 2 * 3 + 4 * 5 + 6"""
-# data = """1 + 2 * 3"""
-# lines = data.splitlines()
 
 
 def postfix_eval(line, inprec, outprec):
@@ -78,24 +67,4 @@ def b():
     return sum(postfix_eval(line, inprec, outprec) for line in lines)
 
 
-def main():
-    astart = time.perf_counter()
-    ra = a()
-    aend = time.perf_counter()
-    if ra is not None:
-        print("part a")
-        print(ra)
-        print(f"Time taken: {aend-astart:.4f} sec")
-        submit(ra, part="a")
-
-    bstart = time.perf_counter()
-    rb = b()
-    bend = time.perf_counter()
-    if rb is not None:
-        print("part b")
-        print(rb)
-        print(f"Time taken: {bend-bstart:.4f} sec")
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

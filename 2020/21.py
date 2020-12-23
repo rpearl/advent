@@ -1,4 +1,5 @@
-from aocd import data, lines, submit
+submit = True
+from aocd import data, lines
 import sys
 from collections import Counter, defaultdict, deque, namedtuple
 import functools
@@ -8,21 +9,6 @@ import u
 import math
 import time
 import operator
-
-import z3
-
-
-def nosubmit(answer, part):
-    print(f"Part {part}:\n{answer}")
-
-
-# submit = nosubmit
-
-data2 = """mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
-trh fvjkl sbzzf mxmxvkd (contains dairy)
-sqjhc fvjkl (contains soy)
-sqjhc mxmxvkd sbzzf (contains fish)"""
-lines = data.splitlines()
 
 print(f"File line count: {len(lines)}")
 
@@ -97,22 +83,4 @@ def b():
     return ",".join(out)
 
 
-def main():
-    astart = time.perf_counter()
-    ra = a()
-    aend = time.perf_counter()
-    if ra is not None:
-        print(ra)
-        print(f"Time taken: {aend-astart:.4f} sec")
-        submit(ra, part="a")
-
-    bstart = time.perf_counter()
-    rb = b()
-    bend = time.perf_counter()
-    if rb is not None:
-        print(rb)
-        print(f"Time taken: {bend-bstart:.4f} sec")
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

@@ -1,4 +1,5 @@
-from aocd import lines, submit
+# submit = True
+from aocd import lines
 import sys
 from collections import Counter, defaultdict, deque
 import functools
@@ -7,94 +8,65 @@ import itertools
 import u
 
 
-def nosubmit(answer, part):
-    print(f"Part {part}:\n{answer}")
-
-
-submit = nosubmit
-
-# data = """#.##.##.##
-########.##
-##.#.#..#..
-#####.##.##
-##.##.##.##
-##.#####.##
-# ..#.#.....
-###########
-##.######.#
-##.#####.##"""
-#
-# lines = data.split("\n")
-
 print(f"File line count: {len(lines)}")
 ds = u.dirs + u.diags
 
 
 def a():
-    b = u.Grid(lines)
+    grid, _, _ = u.make_grid(lines, lambda val, pos: val if val != "." else None)
 
-    def occd(pos, d):
-        npos = (pos[0] + d[0], pos[1] + d[1])
-        return int(b.grid.get(npos) == "#")
-
-    chairs = [pos for pos, c in b.grid.items() if c != "."]
     while True:
         count = 0
-        swaps = []
-        for pos in chairs:
-            c = b.grid[pos]
-            if c == ".":
-                continue
+        counts = Counter()
+        for pos, c in grid.items():
             if c == "#":
                 count += 1
-            s = sum(occd(pos, d) for d in ds)
-            if c == "L" and s == 0 or c == "#" and s >= 4:
-                swaps.append((pos, "L" if c == "#" else "#"))
+                counts.update(u.all_neighbors(grid, pos))
 
-        if len(swaps) == 0:
+        done = True
+        for pos, c in grid.items():
+            s = counts[pos]
+            if c == "L" and s == 0:
+                grid[pos] = "#"
+                done = False
+            elif c == "#" and s >= 4:
+                grid[pos] = "L"
+                done = False
+        if done:
             return count
-        for pos, c in swaps:
-            b.grid[pos] = c
 
 
 def b():
-    b = u.Grid(lines)
+    grid, width, height = u.make_grid(
+        lines, lambda val, pos: val if val != "." else None
+    )
 
-    def occd(pos, d):
-        npos = (pos[0] + d[0], pos[1] + d[1])
-        while b.grid.get(npos) == ".":
-            npos = (npos[0] + d[0], npos[1] + d[1])
-        return int(b.grid.get(npos) == "#")
-
-    chairs = [pos for pos, c in b.grid.items() if c != "."]
+    def neighbors(pos):
+        for d in ds:
+            npos = (pos[0] + d[0], pos[1] + d[1])
+            while npos not in grid and 0 <= npos[0] <= width and 0 <= npos[1] <= height:
+                npos = (npos[0] + d[0], npos[1] + d[1])
+            if npos in grid:
+                yield npos
 
     while True:
         count = 0
-        swaps = []
-        for pos in chairs:
-            c = b.grid[pos]
-            if c == ".":
-                continue
+        counts = Counter()
+        for pos, c in grid.items():
             if c == "#":
                 count += 1
-            s = sum(occd(pos, d) for d in ds)
-            if c == "L" and s == 0 or c == "#" and s >= 5:
-                swaps.append((pos, "L" if c == "#" else "#"))
-
-        if len(swaps) == 0:
+                counts.update(neighbors(pos))
+        done = True
+        for pos, c in grid.items():
+            s = counts[pos]
+            if c == "L" and s == 0:
+                grid[pos] = "#"
+                done = False
+            elif c == "#" and s >= 5:
+                grid[pos] = "L"
+                done = False
+        if done:
             return count
-        for pos, c in swaps:
-            b.grid[pos] = c
 
 
-def main():
-    ra = a()
-    if ra is not None:
-        submit(ra, part="a")
-
-    rb = b()
-    if rb is not None:
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

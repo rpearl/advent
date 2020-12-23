@@ -1,15 +1,11 @@
-from aocd import data, submit
-import sys
-
-print(len(data.split("\n")))
-
-if len(sys.argv) < 2 or sys.argv[1] != "y":
-    submit = lambda *k, **a: None
+# submit=True
+from aocd import lines
+import u
 
 
 def a():
     s = 0
-    for line in data.split("\n"):
+    for line in lines:
         policy, pwd = line.split(":")
         rng, c = policy.split(" ")
         lo, hi = [int(x) for x in rng.split("-")]
@@ -22,7 +18,7 @@ def a():
 
 def b():
     s = 0
-    for line in data.split("\n"):
+    for line in lines:
         policy, pwd = line.split(":")
         pwd = pwd.strip()
         rng, c = policy.split(" ")
@@ -33,16 +29,4 @@ def b():
     return s
 
 
-def main():
-    ra = a()
-    if ra:
-        print(ra)
-        submit(ra, part="a")
-
-    rb = b()
-    if rb:
-        print(rb)
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

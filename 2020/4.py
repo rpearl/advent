@@ -1,20 +1,15 @@
-from aocd import data, submit
+# submit=True
+from aocd import data
 import sys
-
-print(len(data.split("\n")))
-
-def nosubmit(answer, **kwargs):
-    print(answer)
-
-if len(sys.argv) < 2 or sys.argv[1] != "y":
-    submit = nosubmit
+import u
 
 valid = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"}
+
 
 def parse(txt):
     passport = {}
     for field in " ".join(txt.split("\n")).split(" "):
-        k,v = field.split(':')
+        k, v = field.split(":")
         passport[k] = v
 
     if not all(k in valid for k in passport.keys()):
@@ -67,14 +62,4 @@ def b():
     return s
 
 
-def main():
-    ra = a()
-    if ra is not None:
-        submit(ra, part="a")
-
-    rb = b()
-    if rb is not None:
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

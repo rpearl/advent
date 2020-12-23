@@ -1,28 +1,9 @@
-from aocd import data, submit
+submit = True
+from aocd import lines
 import sys
 from collections import Counter, defaultdict, deque
-import cachetools
 import u
 
-
-def nosubmit(answer, part):
-    print(f"Part {part}:\n{answer}")
-
-
-submit = nosubmit
-
-d = """nop +0
-acc +1
-jmp +4
-acc +3
-jmp -3
-acc -99
-acc +1
-jmp -4
-acc +6"""
-
-lines = data.split("\n")
-print(f"File lines: {len(lines)}")
 
 insns = []
 
@@ -30,8 +11,6 @@ for line in lines:
     op, offs = line.split(" ")
     offs = int(offs.replace("+", ""))
     insns.append((op, offs))
-
-# print(insns)
 
 
 def interpret(insns):
@@ -79,14 +58,4 @@ def b():
         insns[i] = (rop, o)
 
 
-def main():
-    ra = a()
-    if ra is not None:
-        submit(ra, part="a")
-
-    rb = b()
-    if rb is not None:
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

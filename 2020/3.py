@@ -1,26 +1,10 @@
-from aocd import data, submit
-import sys
-
-# data = """..##.......
-##...#...#..
-# .#....#..#.
-# ..#.#...#.#
-# .#...##..#.
-# ..#.##.....
-# .#.#.#....#
-# .#........#
-##.##...#...
-##...##....#
-# .#..#...#.#"""
-
-print(len(data.split("\n")))
-
-if len(sys.argv) < 2 or sys.argv[1] != "y":
-    submit = lambda *k, **a: None
+# submit=True
+from aocd import lines
+import u
 
 
 def a():
-    grid = data.split("\n")
+    grid = lines
     s = 0
     x = 0
     y = 0
@@ -33,7 +17,7 @@ def a():
 
 
 def b():
-    grid = data.split("\n")
+    grid = lines
     ss = 1
     for dx, dy in [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]:
         s = 0
@@ -48,16 +32,4 @@ def b():
     return ss
 
 
-def main():
-    ra = a()
-    if ra:
-        print(ra)
-        submit(ra, part="a")
-
-    rb = b()
-    if rb:
-        print(rb)
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

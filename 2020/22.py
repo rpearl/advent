@@ -1,4 +1,5 @@
-from aocd import data, lines, submit
+submit = True
+from aocd import data, lines
 import sys
 from collections import Counter, defaultdict, deque
 import functools
@@ -8,28 +9,6 @@ import u
 import math
 import time
 import operator
-
-
-def nosubmit(answer, part):
-    print(f"Part {part}:\n{answer}")
-
-
-data2 = """Player 1:
-9
-2
-6
-3
-1
-
-Player 2:
-5
-8
-4
-7
-10"""
-# submit = nosubmit
-
-print(f"File line count: {len(lines)}")
 
 
 def a():
@@ -83,22 +62,4 @@ def b():
     return sum((len(deck) - i) * c for i, c in enumerate(deck))
 
 
-def main():
-    astart = time.perf_counter()
-    ra = a()
-    aend = time.perf_counter()
-    if ra is not None:
-        print(ra)
-        print(f"Time taken: {aend-astart:.4f} sec")
-        submit(ra, part="a")
-
-    bstart = time.perf_counter()
-    rb = b()
-    bend = time.perf_counter()
-    if rb is not None:
-        print(rb)
-        print(f"Time taken: {bend-bstart:.4f} sec")
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

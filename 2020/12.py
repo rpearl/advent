@@ -1,4 +1,5 @@
-from aocd import lines, data, submit
+# submit = True
+from aocd import lines, data
 import sys
 from collections import Counter, defaultdict, deque
 import functools
@@ -6,26 +7,6 @@ from sortedcontainers import SortedList, SortedDict, SortedSet
 import itertools
 import u
 from u import N, S, E, W
-
-
-def nosubmit(answer, part):
-    print(f"Part {part}:\n{answer}")
-
-
-submit = nosubmit
-
-
-print(f"File line count: {len(lines)}")
-
-
-# data = """F10
-# N3
-# F7
-# R90
-# F11"""
-# lines = data.splitlines()
-
-
 import math
 
 
@@ -94,14 +75,4 @@ def b():
     pass
 
 
-def main():
-    ra = a()
-    if ra is not None:
-        submit(ra, part="a")
-
-    rb = b()
-    if rb is not None:
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))

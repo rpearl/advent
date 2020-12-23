@@ -1,4 +1,5 @@
-from aocd import data, lines, submit
+submit = True
+from aocd import data, lines
 import sys
 from collections import Counter, defaultdict, deque
 import functools
@@ -7,38 +8,6 @@ import itertools
 import u
 import math
 import operator
-
-
-def nosubmit(answer, part):
-    print(f"Part {part}:\n{answer}")
-
-
-_submit = submit
-
-
-def _sbmt(answer, part):
-    nosubmit(answer, part)
-    _submit(answer, part)
-
-
-submit = _sbmt
-# submit = nosubmit
-
-
-print(f"File line count: {len(lines)}")
-
-data2 = """class: 1-3 or 5-7
-row: 6-11 or 33-44
-seat: 13-40 or 45-50
-
-your ticket:
-7,1,14
-
-nearby tickets:
-7,3,47
-40,4,50
-55,2,20
-38,6,12"""
 
 
 def a():
@@ -119,14 +88,4 @@ def b():
     return s
 
 
-def main():
-    ra = a()
-    if ra is not None:
-        submit(ra, part="a")
-
-    rb = b()
-    if rb is not None:
-        submit(rb, part="b")
-
-
-main()
+u.main(a, b, submit=globals().get("submit", False))
