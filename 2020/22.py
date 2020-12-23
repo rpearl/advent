@@ -49,7 +49,9 @@ def a():
     return sum((len(deck) - i) * c for i, c in enumerate(deck))
 
 
-def play_game(*cards):
+def play_game(*cards, subgame=False):
+    if subgame and max(cards[0]) > max(cards[1]):
+        return 0
     seen = set()
     while cards[0] and cards[1]:
         key = tuple(map(tuple, cards))
@@ -61,9 +63,9 @@ def play_game(*cards):
             if len(cards[0]) >= draw0 and len(cards[1]) >= draw1:
                 subdeck0 = cards[0][:draw0]
                 subdeck1 = cards[1][:draw1]
-                winner = play_game(subdeck0, subdeck1)
+                winner = play_game(subdeck0, subdeck1, subgame=True)
             else:
-                winner = 0 if draw0 > draw1 else 1
+                winner = draw1 > draw0
         seen.add(key)
         draw = draw0, draw1
         cards[winner].extend([draw[winner], draw[1 - winner]])
