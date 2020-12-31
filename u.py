@@ -1,9 +1,11 @@
 import itertools
 import cachetools
 from math import gcd
-from collections import deque
+from collections import deque, defaultdict
+from sortedcontainers import SortedSet
 import re
 import time
+import math
 from aocd import submit as sbmt
 
 
@@ -32,6 +34,14 @@ def chunks(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     args = [iter(iterable)] * n
     return itertools.zip_longest(fillvalue=fillvalue, *args)
+
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return itertools.chain.from_iterable(
+        itertools.combinations(s, r) for r in range(len(s) + 1)
+    )
 
 
 def lcm(a, b):
@@ -79,6 +89,7 @@ class DisjointSets:
     def __len__(self):
         return self.size
 
+
 def make_grid(rows, func=None):
     height = len(rows)
     width = len(rows[0])
@@ -89,23 +100,28 @@ def make_grid(rows, func=None):
             p = rows[y][x]
             val = p if func is None else func(p, (x, y))
             if val is not None:
-                grid[x,y] = val
+                grid[x, y] = val
     return grid, width, height
+
 
 def _nbrs(grid, p, ds):
     px, py = p
     for dx, dy in ds:
-        yield (px+dx, py+dy)
+        yield (px + dx, py + dy)
+
 
 def orthogonal(grid, p):
     yield from _nbrs(grid, p, dirs)
 
+
 def diagonal(grid, p):
     yield from _nbrs(grid, p, diags)
+
 
 def all_neighbors(grid, p):
     yield from orthogonal(grid, p)
     yield from diagonal(grid, p)
+
 
 class Grid:
     def __init__(self, rows):
@@ -183,6 +199,27 @@ def bfs(start, neighbors, is_done=None):
     return pred, dists
 
 
+def djikstra(start, neighbors):
+    dist = defaultdict(lambda: math.inf)
+    pred = defaultdict(lambda: None)
+    dist[start] = 0
+    queue = SortedSet(key=lambda v: dist[v])
+    queue.add(start)
+    print("got here")
+
+    while queue:
+        u = queue.pop(0)
+        for v, w_uv in neighbors(u):
+            alt = dist[u] + w_uv
+            if alt < dist[v]:
+                if v in queue:
+                    queue.remove(v)
+                dist[v] = alt
+                pred[v] = u
+                queue.add(v)
+    return pred, dist
+
+
 N = (0, 1)
 S = (0, -1)
 E = (1, 0)
@@ -233,7 +270,7 @@ def main(a, b, submit=False):
     ra = a()
     aend = time.perf_counter()
     if ra is not None:
-        print(f'Part a: {ra}')
+        print(f"Part a: {ra}")
         print(f"Time taken: {aend-astart:.4f} sec")
         if submit:
             sbmt(ra, part="a")
@@ -242,7 +279,7 @@ def main(a, b, submit=False):
     rb = b()
     bend = time.perf_counter()
     if rb is not None:
-        print(f'Part b: {rb}')
+        print(f"Part b: {rb}")
         print(f"Time taken: {bend-bstart:.4f} sec")
         if submit:
             sbmt(rb, part="b")

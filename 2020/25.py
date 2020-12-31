@@ -1,5 +1,5 @@
 submit = True
-from aocd import data, lines
+from aocd import numbers
 import sys
 from collections import Counter, defaultdict, deque
 import functools
@@ -11,28 +11,21 @@ import time
 import operator
 
 
-def find_loop(target0, target1):
+def a():
+    card, loop = numbers
     val = 1
     i = 0
-    while val != target0 and val != target1:
+    while True:
         i += 1
         val *= 7
         val %= 20201227
-    if val == target0:
-        return 0, i
-    else:
-        return 1, i
-
-
-def a():
-    pks = u.ints(data)
-
-    i, loop = find_loop(*pks)
-    subj = pks[1 - i]
-    val = 1
-
-    val = pow(subj, loop, 20201227)
-    return val
+        if val == card:
+            subj = loop
+            break
+        elif val == loop:
+            subj = card
+            break
+    return pow(subj, i, 20201227)
 
 
 def b():
