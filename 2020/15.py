@@ -12,32 +12,25 @@ import math
 print(f"File line count: {len(lines)}")
 
 
+def play(turns):
+    spoken = [None] * turns
+    d = u.ints(data)
+    for i, k in enumerate(d[:-1]):
+        spoken[k] = i + 1
+    last = d[-1]
+    for i in range(len(d), turns):
+        s = spoken[last] or i
+        spoken[last] = i
+        last = i - s
+    return last
+
+
 def a():
-    d = {}
-    hist = u.ints(data)
-    for i, x in enumerate(hist[:-1]):
-        d[x] = i
-    while len(hist) < 2020:
-        last = hist[-1]
-        idx = len(hist) - 1
-        prev = d.get(last, idx)
-        hist.append(idx - prev)
-        d[last] = idx
-    return hist[2020 - 1]
+    return play(2020)
 
 
 def b():
-    d = {}
-    hist = u.ints(data)
-    for i, x in enumerate(hist[:-1]):
-        d[x] = i
-    while len(hist) < 30000000:
-        last = hist[-1]
-        idx = len(hist) - 1
-        prev = d.get(last, idx)
-        hist.append(idx - prev)
-        d[last] = idx
-    return hist[30000000 - 1]
+    return play(30000000)
 
 
 u.main(a, b, submit=globals().get("submit", False))

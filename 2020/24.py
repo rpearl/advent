@@ -54,12 +54,11 @@ def position(line):
     return pos
 
 
+positions = set(x for x, n in Counter(map(position, lines)).items() if n % 2)
+
+
 def a():
-    colors = defaultdict(int)
-    for line in lines:
-        pos = position(line)
-        colors[pos] = 1 - colors[pos]
-    return sum(colors.values())
+    return len(positions)
 
 
 def neighbors(pos):
@@ -69,15 +68,17 @@ def neighbors(pos):
 
 
 def b():
-    c = Counter(map(position, lines))
-    active = set(x for x, n in c.items() if n % 2)
+    active = set(positions)
 
     for step in range(100):
-        counts = Counter(itertools.chain.from_iterable(map(neighbors, active)))
-        for pos, count in counts.items():
-            c = pos in active
-            if (c and count == 1) or (c and count > 3) or (not c and count == 2):
-                active ^= {pos}
+        for pos, count in Counter(
+            itertools.chain.from_iterable(map(neighbors, active))
+        ).items():
+            if pos in active:
+                if count == 1 or count > 3:
+                    active.remove(pos)
+            elif count == 2:
+                active.add(pos)
 
     return len(active)
     #        day = step + 1

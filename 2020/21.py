@@ -64,7 +64,6 @@ def b():
     for al, counts in allergens.items():
         m = max(counts.values())
         candidates[al] = set(ingred for ingred, c in counts.items() if c == m)
-    print(candidates)
 
     assigned = dict()
     while len(assigned) < len(candidates):
