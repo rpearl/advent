@@ -33,7 +33,6 @@ def a():
 
 
 def b():
-    buf = deque([])
     c=0
     d = u.ints(data)
     for i in range(3,len(d)):
