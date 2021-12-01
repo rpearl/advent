@@ -1,5 +1,5 @@
 #submit=True
-from aocd import data, lines
+from aocd import data, lines #type: ignore
 import sys
 from collections import Counter, defaultdict, deque
 import functools
