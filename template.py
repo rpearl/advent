@@ -10,6 +10,10 @@ import math
 import time
 import operator
 
+ints = u.ints(data)
+intlines = u.lmap(u.ints, lines)
+toklines = [line.split(' ') for line in lines]
+
 def a():
     pass
 
