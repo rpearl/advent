@@ -14,50 +14,35 @@ ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
-def a():
-    cs = []
-    for i in range(len(lines[0])):
-        cs.append(Counter())
-    for line in lines:
-        for i, b in enumerate(line):
-            cs[i][b] += 1
+def most_common(s, i):
+    ones = sum(line[i] == '1' for line in s)
+    return '1' if 2*ones >= len(s) else '0'
 
+def least_common(s, i):
+    return '0' if most_common(s, i)=='1' else '1'
+
+def a():
     g = []
     e = []
-    for c in cs:
-        b = c.most_common(1)[0][0]
-        g.append(b)
-        e.append('1' if b == '0' else '0')
+    for i in range(len(lines[0])):
+        g.append(most_common(lines,i))
+        e.append(least_common(lines,i))
     g = int(''.join(g), 2)
     e = int(''.join(e), 2)
     return g*e
 
+def oxy(l, i=0):
+    if len(l) == 1:
+        return int(l[0], 2)
+    mc = most_common(l, i)
+    return oxy([line for line in l if line[i] == mc], i+1)
+def co2(l, i=0):
+    if len(l) == 1:
+        return int(l[0], 2)
+    lc = least_common(l, i)
+    return co2([line for line in l if line[i] == lc], i+1)
 
 def b():
-    o2 = list(lines)
-    while len(o2) > 1:
-        cs = []
-        for i in range(len(o2[0])):
-            c = Counter()
-            for line in o2:
-                c[line[i]] += 1
-            m, l = c.most_common()
-            mb = m[0] if m[1] != l[1] else '1'
-            o2 = [line for line in o2 if line[i] == mb]
-            if len(o2) == 1: break
-
-    co = list(lines)
-    while len(co) > 1:
-        for i in range(len(co[0])):
-            c = Counter()
-            for line in co:
-                c[line[i]] += 1
-            m, l = c.most_common()
-            lb = l[0] if l[1] != m[1] else '0'
-            co = [line for line in co if line[i] == lb]
-            if len(co) == 1: break
-    o2 = int(o2[0], 2)
-    co = int(co[0], 2)
-    return o2*co
+    return oxy(lines) * co2(lines)
 
 u.main(a, b, submit=globals().get('submit', False))
