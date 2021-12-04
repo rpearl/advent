@@ -14,7 +14,7 @@ ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
-def winner(board, draws):
+def winner(board, draws, inf):
     h = len(board)
     w = len(board[0])
     rowmarks = [0]*w
@@ -32,12 +32,12 @@ def winner(board, draws):
                     unmarked.remove(draw)
         if any(rowmark == w for rowmark in rowmarks) or any(colmark == h for colmark in colmarks):
             return i, unmarked, draw
-    return None
+    return inf, None, None
 
 def a():
     draws = intlines[0]
     boards = [board[1:] for board in u.chunks(intlines[1:], 6)]
-    results = filter(bool, [winner(board, draws) for board in boards])
+    results = [winner(board, draws, math.inf) for board in boards]
     _, unmarked, draw = min(results, key=lambda p:p[0])
     return sum(unmarked) * draw
 
@@ -45,7 +45,7 @@ def a():
 def b():
     draws = intlines[0]
     boards = [board[1:] for board in u.chunks(intlines[1:], 6)]
-    results = filter(bool, [winner(board, draws) for board in boards])
+    results = [winner(board, draws, -math.inf) for board in boards]
     _, unmarked, draw = max(results, key=lambda p:p[0])
     return sum(unmarked) * draw
 
