@@ -18,6 +18,14 @@ flathexdirs = {
     'nw': (-1, 0),
 }
 
+def sign(n):
+    if n > 0:
+        return 1
+    elif n == 0:
+        return 0
+    else:
+        return -1
+
 def hex_axial_to_cube(pos):
     q,r = pos
     return (q,r,-q-r)
