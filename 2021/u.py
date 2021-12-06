@@ -333,3 +333,4 @@ def main(a, b, submit=False):
         print(f"Time taken: {bend-bstart:.4f} sec")
         if submit:
             sbmt(rb, part="b")
+    print()
