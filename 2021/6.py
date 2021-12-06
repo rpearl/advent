@@ -14,42 +14,22 @@ ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
-def zeroes():
-    return [0]*9
+
+def run(days):
+    state = list(ints)
+    phases = deque(ints.count(i) for i in range(9))
+    for i in range(days):
+        num = phases.popleft()
+        phases.append(num)
+        phases[6] += num
+    return sum(phases)
 
 def a():
-    state = list(ints)
-    phases = zeroes()
-    for fish in state:
-        phases[fish] += 1
-    for i in range(80):
-        new_phases = zeroes()
-        for d, count in enumerate(phases):
-            if d == 0:
-                new_phases[8] += count
-                new_phases[6] += count
-            else:
-                new_phases[d-1] += count
-        phases = new_phases
-    return sum(new_phases)
+    return run(80)
 
 
 def b():
-    state = list(ints)
-    phases = zeroes()
-    for fish in state:
-        phases[fish] += 1
-    for i in range(256):
-        new_phases = zeroes()
-        for d, count in enumerate(phases):
-            if d == 0:
-                new_phases[8] += count
-                new_phases[6] += count
-            else:
-                new_phases[d-1] += count
-        phases = new_phases
-
-    return sum(new_phases)
+    return run(256)
 
 
 
