@@ -21,15 +21,16 @@ def cost(n):
     n=abs(n)
     return n*(n+1)//2
 
-def a():
+def calc(costfn):
     lo = min(crabs)
     hi = max(crabs)
-    return min(sum(abs(crab-i) for crab in crabs) for i in range(lo, hi+1))
+    return min(sum(costfn(crab-i) for crab in crabs) for i in range(lo, hi+1))
+
+def a():
+    return calc(costfn=abs)
 
 
 def b():
-    lo = min(crabs)
-    hi = max(crabs)
-    return min(sum(cost(crab-i) for crab in crabs) for i in range(lo, hi+1))
+    return calc(costfn=cost)
 
 u.main(a, b, submit=globals().get('submit', False))
