@@ -46,35 +46,33 @@ def b():
             return ''.join(sorted(sigs))
         def get(sigs):
             return invmap[key(sigs)]
-        def add(d, s1):
+        def add(d, s):
             assert d not in mapping
-            mapping[d] = set(s1)
-            invmap[key(s1)] = str(d)
+            mapping[d] = s
+            invmap[key(s)] = str(d)
         siggroups = defaultdict(list)
         for s in signals:
-            siggroups[len(s)].append(s)
+            siggroups[len(s)].append(set(s))
         add(1, siggroups[2][0])
         add(4, siggroups[4][0])
         add(7, siggroups[3][0])
         add(8, siggroups[7][0])
 
-        for s1 in siggroups[6]:
-            s = set(s1)
+        for s in siggroups[6]:
             if mapping[1].issubset(s):
                 if mapping[4].issubset(s):
-                    add(9, s1)
+                    add(9, s)
                 else:
-                    add(0, s1)
+                    add(0, s)
             else:
-                add(6, s1)
-        for s1 in siggroups[5]:
-            s = set(s1)
+                add(6, s)
+        for s in siggroups[5]:
             if mapping[7].issubset(s):
-                add(3, s1)
+                add(3, s)
             elif s.issubset(mapping[6]):
-                add(5, s1)
+                add(5, s)
             else:
-                add(2, s1)
+                add(2, s)
         assert(len(mapping) == 10)
         o = int(''.join(get(digit) for digit in output))
         tot += o
