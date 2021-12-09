@@ -1,4 +1,4 @@
-#submit=True
+submit=True
 from aocd import data, lines #type: ignore
 import sys
 from collections import Counter, defaultdict, deque
@@ -42,29 +42,16 @@ toklines = [line.split(' ') for line in lines]
 # g: 7
 
 def a():
-    counts = defaultdict(int)
+    tot = 0
     for line in lines:
-        signals, output = line.split(' | ')
-        signals = signals.split()
+        _, output = line.split(' | ')
         output = output.split()
         for o in output:
-            if len(o) == 2:
-                counts[1] += 1
-            elif len(o) == 4:
-                counts[4] += 1
-            elif len(o) == 3:
-                counts[7] += 1
-            elif len(o) == 7:
-                counts[8] += 1
-    return sum(counts.values())
-    pass
+            if len(o) in {2,3,4,7}:
+                tot += 1
+    return tot
 
-def get(s):
-    assert len(s) == 1, s
-    return list(s)[0]
-
-unscrambled = {
-    frozenset(segs): str(i) for i, segs in enumerate([
+unscrambled_segs = [
     'abcefg',
     'cf',
     'acdeg',
@@ -75,48 +62,26 @@ unscrambled = {
     'acf',
     'abcdefg',
     'abcdfg',
-])}
+]
 
+score = Counter(''.join(unscrambled_segs))
 
-
+unscrambled = {
+    sum(score[seg] for seg in segs): i for i, segs in enumerate(unscrambled_segs)
+}
 
 def b():
     tot = 0
-    segmap = {}
     for line in lines:
+        mapping = {}
         signals, output = line.split(' | ')
         signals = signals.split()
         output = output.split()
         frequencies = Counter(''.join(signals))
-        invfreq = defaultdict(list)
-        for pseg, count in frequencies.items():
-            invfreq[count].append(pseg)
-
-        ac = invfreq[8]
-        dg = invfreq[7]
-
-        assert len(invfreq[6]) == 1
-        segmap[invfreq[6][0]] = 'b'
-
-        assert len(invfreq[4]) == 1
-        segmap[invfreq[4][0]] = 'e'
-
-        assert len(invfreq[9]) == 1
-        segmap[invfreq[9][0]] = 'f'
-
-        # 4 has d and not g
-        four = [sig for sig in signals if len(sig) == 4][0]
-        segmap[get(set(dg)&set(four))] = 'd'
-        segmap[get(set(dg)-set(four))] = 'g'
-
-        # 1 has c and not a
-        one = [sig for sig in signals if len(sig) == 2][0]
-        segmap[get(set(ac) & set(one))] = 'c'
-        segmap[get(set(ac) - set(one))] = 'a'
-        assert len(segmap)==7
-        assert len(set(segmap.values()))==7
-
-        o = int(''.join(unscrambled[frozenset(segmap[d] for d in digit)] for digit in output))
+        for sig in signals:
+            sigscore = sum(frequencies[s] for s in sig)
+            mapping[frozenset(sig)] = unscrambled[sigscore]
+        o = u.to_int(mapping[frozenset(digit)] for digit in output)
         tot += o
     return tot
 
