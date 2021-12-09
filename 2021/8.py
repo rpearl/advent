@@ -42,17 +42,13 @@ def b():
         output = output.split()
         mapping = {}
         invmap = {}
-        def key(sigs):
-            return ''.join(sorted(sigs))
-        def get(sigs):
-            return invmap[key(sigs)]
         def add(d, s):
             assert d not in mapping
             mapping[d] = s
-            invmap[key(s)] = str(d)
+            invmap[s] = str(d)
         siggroups = defaultdict(list)
         for s in signals:
-            siggroups[len(s)].append(set(s))
+            siggroups[len(s)].append(frozenset(s))
         add(1, siggroups[2][0])
         add(4, siggroups[4][0])
         add(7, siggroups[3][0])
@@ -74,7 +70,7 @@ def b():
             else:
                 add(2, s)
         assert(len(mapping) == 10)
-        o = int(''.join(get(digit) for digit in output))
+        o = int(''.join(invmap[frozenset(digit)] for digit in output))
         tot += o
     return tot
 
