@@ -9,6 +9,22 @@ import time
 import math
 from aocd import submit as sbmt
 
+def invert(d, multiple=False):
+    out = defaultdict(list)
+    for k, v in d.items():
+        if multiple:
+            out[v].append(k)
+        else:
+            out[v] = k
+    return dict(out)
+
+def to_int(l, base=10):
+    o = 0
+    for d in l:
+        o *= base
+        o += d
+    return o
+
 flathexdirs = {
     'n': (0, -1),
     'ne': (1, -1),
