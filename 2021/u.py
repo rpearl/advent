@@ -165,7 +165,9 @@ def make_grid(rows, func=None):
 def _nbrs(grid, p, ds):
     px, py = p
     for dx, dy in ds:
-        yield (px + dx, py + dy)
+        n = (px + dx, py + dy)
+        if n in grid:
+            yield n
 
 def max_index(l):
     idx = -1
