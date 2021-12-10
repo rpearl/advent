@@ -10,25 +10,11 @@ import math
 import time
 import operator
 import statistics
-#data="""[({(<(())[]>[[{[]{<()<>>
-#[(()[<>])]({[<{<<[]>>(
-#{([(<{}[<>[]}>{[]{[(<()>
-#(((({<>}<{<{<>}{[]{[]{}
-#[[<[([]))<([[{}[[()]]]
-#[{[{({}]{}}([{[{{{}}([]
-#{<[[]]>}<{[{[{[]{()[[[]
-#[<(<(<(<{}))><([]([]()
-#<{([([[(<>()){}]>(<<{{
-#<{([{{}}[<[[[<>{}]]]>[]]"""
-#lines=data.splitlines()
 
 ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 braces = {'(': ')', '[': ']', '{':'}', '<': '>'}
-invbraces = u.invert(braces)
-opens = set(braces.keys())
-closes = set(braces.values())
 def a():
     scores = {')': 3, ']': 57, '}': 1197, '>': 25137}
     score = 0
@@ -38,8 +24,7 @@ def a():
             if c in braces:
                 s.append(c)
             else:
-                o = s.pop()
-                if braces[o] != c:
+                if braces[s.pop()] != c:
                     score += scores[c]
                     break
     return score
@@ -49,24 +34,16 @@ def b():
     scores = []
     bracescore = {'(': 1, '[': 2, '{': 3, '<': 4}
     for line in lines:
-        linescore = 0
         s = []
-        corrupt = False
         for c in line:
             if c in braces:
                 s.append(c)
             else:
-                o = s.pop()
-                if braces[o] != c:
-                    corrupt = True
+                if braces[s.pop()] != c:
                     break
-        if corrupt:
-            continue
-        while s:
-            linescore *= 5
-            o = s.pop()
-            linescore += bracescore[o]
-        scores.append(linescore)
+        else:
+            linescore = functools.reduce(lambda tot, o: tot*5+bracescore[o], reversed(s), 0)
+            scores.append(linescore)
     return statistics.median(scores)
 
     pass
