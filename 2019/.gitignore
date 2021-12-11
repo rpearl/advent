@@ -1,4 +1,0 @@
-*.in
-__pycache__
-.*.sw*
-venv
