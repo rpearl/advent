@@ -41,18 +41,11 @@ def a():
     dots = [u.ints(d) for d in dots.splitlines()]
     insns = insns.splitlines()
     grid = set(tuple(p) for p in dots)
-    width = max(x for x,y in grid)+1
-    height = max(y for x,y in grid)+1
     for insn in insns:
-        val = u.ints(insn)[0]
-        axis = insn[len('fold along ')][-1]
+        axis, val = u.fixparse('fold along {}={:d}', insn)
         newgrid = set()
         for pos in grid:
-            if pos not in grid:
-                continue
-            x,y = pos
-            newx = x
-            newy = y
+            x,y = newx, newy = pos
             if axis == 'y' and y > val:
                 newx = x
                 newy = val-(y-val)
@@ -71,34 +64,22 @@ def b():
     dots, insns = data.split('\n\n')
     dots = [u.ints(d) for d in dots.splitlines()]
     insns = insns.splitlines()
-    grid = set(tuple(p) for p in dots)
+    grid = {tuple(p): True for p in dots}
     for insn in insns:
-        val = u.ints(insn)[0]
-        axis = insn[len('fold along ')][-1]
-        newgrid = set()
+        axis, val = u.fixparse('fold along {}={:d}', insn)
+        newgrid = {}
         for pos in grid:
-            if pos not in grid:
-                continue
-            x,y = pos
-            newx = x
-            newy = y
+            x,y = newx, newy = pos
             if axis == 'y' and y > val:
                 newx = x
                 newy = val-(y-val)
             elif axis == 'x' and x > val:
                 newx = val-(x-val)
                 newy = y
-            newgrid.add((newx, newy))
+            newgrid[newx,newy] = True
         grid=newgrid
-        #break
-    width = max(x for x,y in grid)+1
-    height = max(y for x,y in grid)+1
     print()
-    for y in range(height):
-        for x in range(width):
-            print('#' if (x,y) in grid else ' ', end='')
-        print()
-    print()
+    u.print_matrix(grid, {True: '#', False: ' '}, default=False)
     pass
 
 u.main(a, b, submit=globals().get('submit', False))

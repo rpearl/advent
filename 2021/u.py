@@ -8,6 +8,10 @@ import re
 import time
 import math
 from aocd import submit as sbmt
+from parse import parse
+
+def fixparse(pattern, val):
+    return parse(pattern, val).fixed
 
 def invert(d, multiple=False):
     out = defaultdict(list)
