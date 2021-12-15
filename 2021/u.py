@@ -1,5 +1,4 @@
 import itertools
-import cachetools
 from math import gcd
 from collections import deque, defaultdict
 from collections.abc import MutableSequence
@@ -196,60 +195,6 @@ def all_neighbors(grid, p):
     yield from diagonal(grid, p)
 
 
-class Grid:
-    def __init__(self, rows):
-        height = len(rows)
-        width = len(rows[0])
-
-        grid = {}
-
-        for y in range(height):
-            for x in range(width):
-                p = rows[y][x]
-                grid[x, y] = p
-
-        self.grid = grid
-        self.width = width
-        self.height = height
-        self.include_diags = True
-
-    def neighbors(self, pos):
-        for d in dirs:
-            npos = (d[0] + pos[0], d[1] + pos[1])
-
-            if npos in self.grid:
-                yield npos
-        if self.include_diags:
-            for d in diags:
-                npos = (d[0] + pos[0], d[1] + pos[1])
-
-                if npos in self.grid:
-                    yield npos
-
-    @cachetools.cached(cache={}, key=lambda *args: args[0])
-    def reachable(self, pos, is_interesting):
-        visited = set()
-        queue = deque([(pos, 0)])
-
-        r = []
-
-        while queue:
-            p, dist = queue.popleft()
-            if p in visited:
-                continue
-            visited.add(p)
-
-            gp = grid[p]
-
-            if is_interesting(gp) and dist > 0:
-                r.append((gp, dist))
-
-            else:
-                for neighbor in self.neighbors(p):
-                    queue.append((neighbor, dist + 1))
-        return r
-
-
 def bfs(start, neighbors, is_done=None):
     pred = {}
     dists = {}
@@ -274,7 +219,7 @@ def bfs(start, neighbors, is_done=None):
 
 def dijkstra(start, neighbors):
     dist = defaultdict(lambda: math.inf)
-    pred = defaultdict(lambda: None)
+    pred = {}
     dist[start] = 0
     seen = set()
     queue = [(0, start)]
