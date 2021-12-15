@@ -7,6 +7,7 @@ from sortedcontainers import SortedSet
 import re
 import time
 import math
+import heapq
 from aocd import submit as sbmt
 from parse import parse
 
@@ -275,19 +276,19 @@ def dijkstra(start, neighbors):
     dist = defaultdict(lambda: math.inf)
     pred = defaultdict(lambda: None)
     dist[start] = 0
-    queue = SortedSet(key=lambda v: dist[v])
-    queue.add(start)
-
+    seen = set()
+    queue = [(0, start)]
     while queue:
-        u = queue.pop(0)
+        d, u = heapq.heappop(queue)
+        if u in seen: continue
+        seen.add(u)
         for v, w_uv in neighbors(u):
+            if v in seen: continue
             alt = dist[u] + w_uv
             if alt < dist[v]:
-                if v in queue:
-                    queue.remove(v)
                 dist[v] = alt
                 pred[v] = u
-                queue.add(v)
+                heapq.heappush(queue, (alt, v))
     return pred, dist
 
 
