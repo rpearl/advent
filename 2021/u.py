@@ -271,13 +271,12 @@ def bfs(start, neighbors, is_done=None):
     return pred, dists
 
 
-def djikstra(start, neighbors):
+def dijkstra(start, neighbors):
     dist = defaultdict(lambda: math.inf)
     pred = defaultdict(lambda: None)
     dist[start] = 0
     queue = SortedSet(key=lambda v: dist[v])
     queue.add(start)
-    print("got here")
 
     while queue:
         u = queue.pop(0)
