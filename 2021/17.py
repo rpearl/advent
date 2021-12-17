@@ -17,7 +17,7 @@ lowx, hix, lowy, hiy = u.fixparse('target area: x={:d}..{:d}, y={:d}..{:d}', dat
 def simulate(vx, vy):
     x, y= 0,0
     maxy = -math.inf
-    while y >= lowy:
+    while y >= lowy and (vx != 0 or lowx <= x <= hix):
         x += vx
         y += vy
         maxy = max(maxy, y)
