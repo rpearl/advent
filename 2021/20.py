@@ -16,7 +16,7 @@ intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
 def binary(ds):
-    return int(''.join(str(d) for d in ds), 2)
+    return u.to_int(ds, base=2)
 
 def kernel(image, pos):
     dirs = [

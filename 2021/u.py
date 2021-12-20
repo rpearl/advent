@@ -25,8 +25,7 @@ def invert(d, multiple=False):
 def to_int(l, base=10):
     o = 0
     for d in l:
-        o *= base
-        o += d
+        o = o*base+d
     return o
 
 flathexdirs = {
