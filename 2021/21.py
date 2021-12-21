@@ -58,32 +58,31 @@ def a():
 
     pass
 
+def rev(p):
+    return (p[1], p[0])
+
+def mul(p, c):
+    return (c*p[0], c*p[1])
 
 def b():
+    rollcounts = Counter(sum(r) for r in itertools.product([1,2,3], repeat=3))
 
     @functools.cache
-    def count_winners(positions, scores, cur):
+    def count_winners(positions, scores):
         wins = (0, 0)
-        for rolls in itertools.product([1,2,3], repeat=3):
-            total = sum(rolls)
-            if cur == 0:
-                np = (wrap(positions[0]+total), positions[1])
-                ns = (scores[0]+np[0], scores[1])
+        for total, freq in rollcounts.items():
+            np0 = wrap(positions[0]+total)
+            np = (positions[1], np0)
+            ns = (scores[1], scores[0]+np0)
+            if ns[1] >= 21:
+                wins = add2(wins, (freq, 0))
             else:
-                np = (positions[0], wrap(positions[1]+total))
-                ns = (scores[0], scores[1]+np[1])
-
-            if ns[0] >= 21:
-                wins = add2(wins, (1, 0))
-            elif ns[1] >= 21:
-                wins = add2(wins, (0, 1))
-            else:
-                wins = add2(wins, count_winners(np, ns, 1-cur))
+                wins = add2(wins, mul(rev(count_winners(np, ns)), freq))
         return wins
     _, p1, _, p2 = ints
     positions = (p1, p2)
     scores = (0, 0)
-    return max(count_winners(positions, scores, 0))
+    return max(count_winners(positions, scores))
     pass
 
 u.main(a, b, submit=globals().get('submit', False))
