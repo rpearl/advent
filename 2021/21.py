@@ -11,78 +11,44 @@ import time
 import operator
 
 ints = u.ints(data)
-intlines = u.lmap(u.ints, lines)
-toklines = [line.split(' ') for line in lines]
-
-def add2(a, b):
-    return (a[0]+b[0], a[1]+b[1])
-
-def sub2(a, b):
-    return (a[0]-b[0], a[1]-b[1])
-
-def move(players, rnd, die):
-    r = rnd % 100
-    m = 3*die + 3
-    if rnd % 2 == 0:
-        np1 = m# wrap(players[0]+m)
-        np2 = 0# players[1]
-    else:
-        np1 = 0# players[0]
-        np2 = m#wrap(players[1]+m)
-    ndie = die+3
-    ndie = ((ndie-1) % 100) + 1
-    return (np1, np2), ndie
-
-def wrap(s):
-    return ((s-1)%10) + 1
 
 def a():
-    _, p1, _, p2 = ints
-    positions = (p1, p2)
-    scores = (0, 0)
-    die = 1
-    rnd = 0
-    while max(scores) < 1000:
-        dpositions, die = move(positions, rnd, die)
-        positions = tuple(map(wrap, add2(positions, dpositions)))
-        if rnd % 2 == 0:
-            dscores = (positions[0], 0)
-        else:
-            dscores = (0, positions[1])
-        scores = add2(scores, dscores)
-        rnd += 1
-        #return
-
-    rolls = rnd*3
-    return min(scores)*rolls
-
-    pass
-
-def rev(p):
-    return (p[1], p[0])
-
-def mul(p, c):
-    return (c*p[0], c*p[1])
+    _, p0, _, p1 = ints
+    s0 = s1 = 0
+    die = zip(itertools.count(1), itertools.cycle(range(1,101)))
+    rolls = ((max(a), sum(b)) for a, b in (zip(*c) for c in u.chunks(die, 3)))
+    for rollcount, total in rolls:
+        np0 = (p0+total) % 10 or 10
+        ns0 = s0 + np0
+        if ns0 >= 1000:
+            break
+        s1, s0 = ns0, s1
+        p1, p0 = np0, p1
+    return s1*rollcount
 
 def b():
-    rollcounts = Counter(sum(r) for r in itertools.product([1,2,3], repeat=3))
+    rollcounts=[(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)]
+    cache = {}
 
-    @functools.cache
-    def count_winners(positions, scores):
-        wins = (0, 0)
-        for total, freq in rollcounts.items():
-            np0 = wrap(positions[0]+total)
-            np = (positions[1], np0)
-            ns = (scores[1], scores[0]+np0)
-            if ns[1] >= 21:
-                wins = add2(wins, (freq, 0))
+    def count_winners(p0, p1, s0, s1):
+        key = (p0,p1,s0,s1)
+        if key in cache:
+            return cache[key]
+        w0 = w1 = 0
+        for total, freq in rollcounts:
+            np0 = (p0+total) % 10 or 10
+            ns0 = s0+np0
+            if ns0 >= 21:
+                w0 += freq
             else:
-                wins = add2(wins, mul(rev(count_winners(np, ns)), freq))
-        return wins
+                rw1, rw0 = count_winners(p1, np0, s1, ns0)
+                w0 += freq*rw0
+                w1 += freq*rw1
+        res=w0,w1
+        cache[key]=res
+        return res
     _, p1, _, p2 = ints
-    positions = (p1, p2)
-    scores = (0, 0)
-    return max(count_winners(positions, scores))
+    return max(count_winners(p1, p2, 0, 0))
     pass
 
 u.main(a, b, submit=globals().get('submit', False))
