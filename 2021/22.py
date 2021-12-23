@@ -47,6 +47,7 @@ def difference(box1, box2):
 def size(box):
     return math.prod(max(0, hi - lo + 1) for lo, hi in box)
 
+@u.timed
 def solve():
     boxes = []
     for line in lines:

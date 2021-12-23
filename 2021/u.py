@@ -1,4 +1,5 @@
 import itertools
+import functools
 from math import gcd
 from collections import deque, defaultdict
 from collections.abc import MutableSequence
@@ -216,7 +217,7 @@ def bfs(start, neighbors, is_done=None):
     return pred, dists
 
 
-def dijkstra(start, neighbors):
+def dijkstra(start, neighbors, target=None):
     dist = defaultdict(lambda: math.inf)
     pred = {}
     dist[start] = 0
@@ -224,7 +225,10 @@ def dijkstra(start, neighbors):
     queue = [(0, start)]
     while queue:
         d, u = heapq.heappop(queue)
-        if u in seen: continue
+        if u in seen:
+            continue
+        if u == target:
+            break
         seen.add(u)
         for v, w_uv in neighbors(u):
             if v in seen: continue
@@ -280,6 +284,24 @@ class Linked:
     def __repr__(self):
         return f"({self.item})"
 
+def timed(func):
+    @functools.wraps(func)
+    def wrapper(*a, **kw):
+        print(f'Running {func.__name__}')
+        start = time.perf_counter()
+        ret = func(*a, **kw)
+        end = time.perf_counter()
+        print(f"Time taken: {end-start:.4f} sec")
+        return ret
+    return wrapper
+
+def incrange(a, b=None, c=None):
+    if b is None and c is None:
+        return range(a+1)
+    elif c is None:
+        return range(a, b+1)
+    else:
+        return range(a, b+1, c)
 
 def main(a, b, submit=False):
     astart = time.perf_counter()
