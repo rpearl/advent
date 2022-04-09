@@ -42,7 +42,7 @@ def a():
     for y in range(height):
         o = []
         for x in range(width):
-            o.append("#" if grid[x, y] else ".")
+            o.append("█" if grid[x, y] else " ")
         print("".join(o))
     return sum(grid.values())
 

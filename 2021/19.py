@@ -85,11 +85,12 @@ def a():
     positions, sensors = position_scanners()
     return len(sensors)
 
-def manhattan(v1, v2):
+def manhattan(p):
+    v1, v2 = p
     v = subvec(v1, v2)
     return abs(v[0]) + abs(v[1]) + abs(v[2])
 
 def b():
-    return max(manhattan(s1, s2) for s1, s2 in itertools.combinations(positions.values(), 2))
+    return max(map(manhattan, itertools.combinations(positions.values(), 2)))
 
 u.main(a, b, submit=globals().get('submit', False))

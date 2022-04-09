@@ -36,8 +36,8 @@ def enhance(enhancement, image):
     miny = min(p[1] for p in image)-1
     maxy = max(p[1] for p in image)+1
     #print(minx, miny, maxx, maxy)
-    for x in range(minx, maxx+1):
-        for y in range(miny, maxy+1):
+    for x in u.incrange(minx, maxx):
+        for y in u.incrange(miny, maxy):
             k = kernel(image, (x, y))
             val = enhancement[k]
             enhanced[x,y] = val

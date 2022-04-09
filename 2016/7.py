@@ -63,18 +63,12 @@ def ssl(line):
     return False
 
 
-print(ssl("zazbz[bzb]cdb"))
-print(ssl("xyx[xyx]xyx"))
-print(ssl("aba[bab]xyz"))
-
-
 def a():
     return sum(tls(line) for line in lines)
 
 
 def b():
     return sum(ssl(line) for line in lines)
-    pass
 
 
 u.main(a, b, submit=globals().get("submit", False))

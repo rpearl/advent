@@ -1,16 +1,78 @@
 import itertools
-import cachetools
+import functools
 from math import gcd
 from collections import deque, defaultdict
+from collections.abc import MutableSequence
 from sortedcontainers import SortedSet
 import re
 import time
 import math
+import heapq
 from aocd import submit as sbmt
+from parse import parse
 
+def fixparse(pattern, val):
+    return parse(pattern, val).fixed
+
+def invert(d, multiple=False):
+    out = defaultdict(list)
+    for k, v in d.items():
+        if multiple:
+            out[v].append(k)
+        else:
+            out[v] = k
+    return dict(out)
+
+def to_int(l, base=10):
+    o = 0
+    for d in l:
+        o = o*base+d
+    return o
+
+flathexdirs = {
+    'n': (0, -1),
+    'ne': (1, -1),
+    'se': (1, 0),
+    's': (0, 1),
+    'sw': (-1,1),
+    'nw': (-1, 0),
+}
+
+def sign(n):
+    if n > 0:
+        return 1
+    elif n == 0:
+        return 0
+    else:
+        return -1
+
+def hex_axial_to_cube(pos):
+    q,r = pos
+    return (q,r,-q-r)
+
+def hex_cube_subtract(a, b):
+    return (a[0]-b[0],a[1]-b[1], a[2]-b[2])
+
+def hex_cube_distance(a, b):
+    q,r,s = hex_cube_subtract(a, b)
+    return max(abs(q), abs(r), abs(s))
+
+def hex_axial_distance(a, b):
+    return hex_cube_distance(hex_axial_to_cube(a), hex_axial_to_cube(b))
 
 def lmap(fn, *its):
     return list(map(fn, *its))
+
+def window(seq, n=2):
+    "Returns a sliding window (of width n) over data from the iterable"
+    "   s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...                   "
+    it = iter(seq)
+    result = tuple(itertools.islice(it, n))
+    if len(result) == n:
+        yield result
+    for elem in it:
+        result = result[1:] + (elem,)
+        yield result
 
 
 def ints(line):
@@ -107,8 +169,18 @@ def make_grid(rows, func=None):
 def _nbrs(grid, p, ds):
     px, py = p
     for dx, dy in ds:
-        yield (px + dx, py + dy)
+        n = (px + dx, py + dy)
+        if n in grid:
+            yield n
 
+def max_index(l):
+    idx = -1
+    m = None
+    for i, x in enumerate(l):
+        if m is None or x > m:
+            m = x
+            idx = i
+    return idx,m
 
 def orthogonal(grid, p):
     yield from _nbrs(grid, p, dirs)
@@ -121,60 +193,6 @@ def diagonal(grid, p):
 def all_neighbors(grid, p):
     yield from orthogonal(grid, p)
     yield from diagonal(grid, p)
-
-
-class Grid:
-    def __init__(self, rows):
-        height = len(rows)
-        width = len(rows[0])
-
-        grid = {}
-
-        for y in range(height):
-            for x in range(width):
-                p = rows[y][x]
-                grid[x, y] = p
-
-        self.grid = grid
-        self.width = width
-        self.height = height
-        self.include_diags = True
-
-    def neighbors(self, pos):
-        for d in dirs:
-            npos = (d[0] + pos[0], d[1] + pos[1])
-
-            if npos in self.grid:
-                yield npos
-        if self.include_diags:
-            for d in diags:
-                npos = (d[0] + pos[0], d[1] + pos[1])
-
-                if npos in self.grid:
-                    yield npos
-
-    @cachetools.cached(cache={}, key=lambda *args: args[0])
-    def reachable(self, pos, is_interesting):
-        visited = set()
-        queue = deque([(pos, 0)])
-
-        r = []
-
-        while queue:
-            p, dist = queue.popleft()
-            if p in visited:
-                continue
-            visited.add(p)
-
-            gp = grid[p]
-
-            if is_interesting(gp) and dist > 0:
-                r.append((gp, dist))
-
-            else:
-                for neighbor in self.neighbors(p):
-                    queue.append((neighbor, dist + 1))
-        return r
 
 
 def bfs(start, neighbors, is_done=None):
@@ -199,24 +217,26 @@ def bfs(start, neighbors, is_done=None):
     return pred, dists
 
 
-def djikstra(start, neighbors):
+def dijkstra(start, neighbors, target=None):
     dist = defaultdict(lambda: math.inf)
-    pred = defaultdict(lambda: None)
+    pred = {}
     dist[start] = 0
-    queue = SortedSet(key=lambda v: dist[v])
-    queue.add(start)
-    print("got here")
-
+    seen = set()
+    queue = [(0, start)]
     while queue:
-        u = queue.pop(0)
+        d, u = heapq.heappop(queue)
+        if u in seen:
+            continue
+        if u == target:
+            break
+        seen.add(u)
         for v, w_uv in neighbors(u):
+            if v in seen: continue
             alt = dist[u] + w_uv
             if alt < dist[v]:
-                if v in queue:
-                    queue.remove(v)
                 dist[v] = alt
                 pred[v] = u
-                queue.add(v)
+                heapq.heappush(queue, (alt, v))
     return pred, dist
 
 
@@ -264,6 +284,24 @@ class Linked:
     def __repr__(self):
         return f"({self.item})"
 
+def timed(func):
+    @functools.wraps(func)
+    def wrapper(*a, **kw):
+        print(f'Running {func.__name__}')
+        start = time.perf_counter()
+        ret = func(*a, **kw)
+        end = time.perf_counter()
+        print(f"Time taken: {end-start:.4f} sec")
+        return ret
+    return wrapper
+
+def incrange(a, b=None, c=None):
+    if b is None and c is None:
+        return range(a+1)
+    elif c is None:
+        return range(a, b+1)
+    else:
+        return range(a, b+1, c)
 
 def main(a, b, submit=False):
     astart = time.perf_counter()
@@ -283,3 +321,4 @@ def main(a, b, submit=False):
         print(f"Time taken: {bend-bstart:.4f} sec")
         if submit:
             sbmt(rb, part="b")
+    print()

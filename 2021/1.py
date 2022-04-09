@@ -9,24 +9,16 @@ import u
 import math
 import time
 import operator
-data2="""199
-200
-208
-210
-200
-207
-240
-269
-260
-263"""
+
+def solve(x):
+    d = u.ints(data)
+    return sum(d[i-x]<d[x] for i in range(x,len(d)))
 
 def a():
-    d = u.ints(data)
-    return sum(d[i-1]<d[i] for i in range(1,len(d)))
+    return solve(1)
 
 
 def b():
-    d = u.ints(data)
-    return sum(d[i-3]<d[i] for i in range(3,len(d)))
+    return solve(3)
 
 u.main(a, b, submit=globals().get('submit', False))
