@@ -239,6 +239,14 @@ def dijkstra(start, neighbors, target=None):
                 heapq.heappush(queue, (alt, v))
     return pred, dist
 
+def clamp(x, lo, hi):
+    if x <= lo:
+        return lo
+    elif x >= hi:
+        return hi
+    else:
+        return x
+
 
 N = (0, 1)
 S = (0, -1)
