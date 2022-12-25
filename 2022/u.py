@@ -11,6 +11,9 @@ import heapq
 from aocd import submit as sbmt
 from parse import parse
 
+def vadd(a,b):
+    return tuple(s+t for s,t in zip(a,b))
+
 def fixparse(pattern, val):
     return parse(pattern, val).fixed
 
@@ -113,6 +116,8 @@ def lcm(a, b):
 dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 diags = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
 
+dirs3 = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
+
 
 class DisjointSets:
     def __init__(self, n):
@@ -203,6 +208,7 @@ def bfs(start, neighbors, is_done=None):
 
     while queue:
         node, parent = queue.popleft()
+        #print(node)
         if node in pred:
             continue
         pred[node] = parent
@@ -216,8 +222,23 @@ def bfs(start, neighbors, is_done=None):
             queue.append((child, node))
     return pred, dists
 
+def floyd_warshall(nodes, neighbors):
+    n = list(nodes)
+    dist = defaultdict(lambda: math.inf)
+    for u in n:
+        dist[u,u] = 0
+        for v, w_uv in neighbors(u):
+            dist[u,v] = w_uv
+    for k in n:
+        for i in n:
+            for j in n:
+                d = dist[i,k] + dist[k,j]
+                if dist[i,j] > d:
+                    dist[i,j] = d
+    return dist
 
-def dijkstra(start, neighbors, target=None):
+
+def dijkstra(start, neighbors, is_done):
     dist = defaultdict(lambda: math.inf)
     pred = {}
     dist[start] = 0
@@ -227,7 +248,7 @@ def dijkstra(start, neighbors, target=None):
         d, u = heapq.heappop(queue)
         if u in seen:
             continue
-        if u == target:
+        if is_done is not None and is_done(u, pred, dist):
             break
         seen.add(u)
         for v, w_uv in neighbors(u):
@@ -248,8 +269,8 @@ def clamp(x, lo, hi):
         return x
 
 
-N = (0, 1)
-S = (0, -1)
+S = (0, 1)
+N = (0, -1)
 E = (1, 0)
 W = (-1, 0)
 
