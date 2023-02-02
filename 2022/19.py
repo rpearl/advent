@@ -105,7 +105,6 @@ def optimize(timeleft, costs, robot_counts, resource_counts):
         return max(choices)
 
 def a():
-    return 1413
     tot = 0
     for num, bp in blueprints.items():
         score = optimize(24, bp, (1, 0, 0), (0, 0, 0))
