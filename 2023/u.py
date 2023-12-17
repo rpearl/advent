@@ -217,17 +217,20 @@ def bfs(start, neighbors, is_done=None):
     return pred, dists
 
 
-def dijkstra(start, neighbors, target=None):
+def dijkstra(starts, neighbors, is_done=None):
     dist = defaultdict(lambda: math.inf)
     pred = {}
-    dist[start] = 0
+    if not isinstance(starts, list):
+        starts = [starts]
+    for start in starts:
+        dist[start] = 0
     seen = set()
-    queue = [(0, start)]
+    queue = [(0, start) for start in starts]
     while queue:
         d, u = heapq.heappop(queue)
         if u in seen:
             continue
-        if u == target:
+        if is_done is not None and is_done(u):
             break
         seen.add(u)
         for v, w_uv in neighbors(u):
@@ -240,12 +243,13 @@ def dijkstra(start, neighbors, target=None):
     return pred, dist
 
 
-N = (0, 1)
-S = (0, -1)
+N = (0, -1)
+S = (0, 1)
 E = (1, 0)
 W = (-1, 0)
 
 rot90 = {N: E, E: S, S: W, W: N}
+opp = {N: S, S: N, E: W, W: E}
 
 
 class Linked:

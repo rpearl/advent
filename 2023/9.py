@@ -1,4 +1,4 @@
-#submit=True
+submit=True
 from aocd import data #type: ignore
 from aocd import submit as sbmt #type: ignore
 import sys
@@ -17,11 +17,24 @@ ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
+def predict(vals, first):
+    if all(v == 0 for v in vals):
+        return 0
+    diffs = [vals[i] - vals[i-1] for i in range(1,len(vals))]
+    p = predict(diffs, first)
+    if first:
+        return vals[0] - p
+    else:
+        return vals[-1] + p
+
+
 def a():
+    return sum(predict(line, first=False) for line in intlines)
     pass
 
 
 def b():
+    return sum(predict(line, first=True) for line in intlines)
     pass
 
 def main():

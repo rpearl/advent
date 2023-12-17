@@ -27,16 +27,13 @@ ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
-def a():
+def make_grid():
     grid={}
-
-    height = len(lines)
-    width = len(lines[0])
-    for y in range(height):
+    for y, line in enumerate(lines):
+        line += '.'
         cur = ''
         curpos = set()
-        for x in range(width):
-            c = lines[y][x]
+        for x, c in enumerate(line):
             if c.isdigit():
                 cur += c
                 curpos.add((x,y))
@@ -46,61 +43,37 @@ def a():
                 curpos = set()
                 cur = ''
                 if c != '.':
-                    grid[x,y] = c
-        for pos in curpos:
-            grid[pos] = (int(cur), min(curpos))
+                    grid[x,y] = (c, None)
+    return grid
 
-
+def a():
+    grid = make_grid()
     vals = {}
-    for pos, c in grid.items():
-        if isinstance(c, str):
-            print(pos, c)
+    for pos, (sym, meta) in grid.items():
+        if meta is None:
             for npos in u.all_neighbors(grid, pos):
-                nbr = grid[npos]
-                if isinstance(nbr, str):
+                nsym, nm = grid[npos]
+                if nm is None:
                     continue
-                vals[nbr[1]] = nbr[0]
+                vals[nm] = nsym
     return sum(vals.values())
 
-    pass
 
 
 def b():
-    grid={}
-
-    height = len(lines)
-    width = len(lines[0])
-    for y in range(height):
-        cur = ''
-        curpos = set()
-        for x in range(width):
-            c = lines[y][x]
-            if c.isdigit():
-                cur += c
-                curpos.add((x,y))
-            else:
-                for pos in curpos:
-                    grid[pos] = (int(cur), min(curpos))
-                curpos = set()
-                cur = ''
-                if c != '.':
-                    grid[x,y] = c
-        for pos in curpos:
-            grid[pos] = (int(cur), min(curpos))
-
+    grid = make_grid()
     s = 0
-    for pos, c in grid.items():
-        if c == '*':
+    for pos, (sym, meta) in grid.items():
+        if sym == '*':
             adjacent = {}
             for npos in u.all_neighbors(grid, pos):
-                nbr = grid[npos]
-                if isinstance(nbr, str):
+                nsym, nm = grid[npos]
+                if nm is None:
                     continue
-                adjacent[nbr[1]] = nbr[0]
+                adjacent[nm] = nsym
             if len(adjacent) == 2:
                 ratio = math.prod(adjacent.values())
                 s += ratio
     return s
-    pass
 
 u.main(a, b, submit=globals().get('submit', False))
