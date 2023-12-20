@@ -33,17 +33,21 @@ toklines = [line.split(' ') for line in lines]
 
 def vadd(p1, p2):
     return (p1[0]+p2[0], p1[1]+p2[1])
+grid, width, height = u.make_grid(lines, func=lambda p,_:int(p))
 
 def a():
     grid, width, height = u.make_grid(lines, func=lambda p,_:int(p))
+    target = (width-1, height-1)
     def neighbors(node):
         pos, d = node
-        d1 = u.rot90[d]
-        d2 = u.rot90[u.rot90[u.rot90[d]]]
+        if pos == target:
+            return
+        d1 = u.right[d]
+        d2 = u.left[d]
         for d in [d1, d2]:
             w = 0
-            for i in range(3):
-                npos = (pos[0] + d[0]*(i+1), pos[1] + d[1]*(i+1))
+            for count in range(1,3+1):
+                npos = (pos[0] + d[0]*count, pos[1] + d[1]*count)
                 if npos in grid:
                     w += grid[npos]
                     yield ((npos, d), w)
@@ -52,18 +56,16 @@ def a():
         ((0,0), u.S),
         ((0,0), u.E)
     ]
-    target = (width-1, height-1)
     _, dists = u.dijkstra(start, neighbors)
     return min(dists[target, d] for d in [u.N, u.S, u.E, u.W])
 
 
 
 def b():
-    grid, width, height = u.make_grid(lines, func=lambda p,_:int(p))
     def neighbors(node):
         pos, d = node
-        d1 = u.rot90[d]
-        d2 = u.rot90[u.rot90[u.rot90[d]]]
+        d1 = u.right[d]
+        d2 = u.left[d]
 
         for d in [d1, d2]:
             w = 0

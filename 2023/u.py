@@ -249,6 +249,9 @@ E = (1, 0)
 W = (-1, 0)
 
 rot90 = {N: E, E: S, S: W, W: N}
+right = rot90
+rot270 = {d: rot90[rot90[rot90[d]]] for d in rot90}
+left = rot270
 opp = {N: S, S: N, E: W, W: E}
 
 
