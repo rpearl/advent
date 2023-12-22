@@ -23,32 +23,35 @@ ints = u.ints(data)
 intlines = u.lmap(u.ints, lines)
 toklines = [line.split(' ') for line in lines]
 
+
+modules = {}
+modules['button'] = ('@', ['broadcaster'], None)
+inputs = defaultdict(set)
+for line in lines:
+    src, dests = line.split(' -> ')
+    dests = dests.split(', ')
+    if src[0] in '%&':
+        typ, src = src[0], src[1:]
+    else:
+        typ = '@'
+        state = None
+    if typ == '%':
+        state = [False]
+    elif typ == '&':
+        state = {}
+    modules[src] = (typ, dests, state)
+    for dest in dests:
+        inputs[dest].add(src)
+
+
 def a():
-    modules = {}
+    for name, (typ, _, state) in modules.items():
+        if typ == '&':
+            for src in inputs[name]:
+                state[src] = False
+        elif typ == '%':
+            state[0] = False
     counts = Counter()
-    modules['button'] = ('@', ['broadcaster'], None)
-    for line in lines:
-        src, dests = line.split(' -> ')
-        dests = dests.split(', ')
-        if src[0] in '%&':
-            typ, src = src[0], src[1:]
-        else:
-            typ = '@'
-            state = None
-        if typ == '%':
-            state = [False]
-        elif typ == '&':
-            state = {}
-        modules[src] = (typ, dests, state)
-
-    for src, (_, dests, _) in modules.items():
-        for dest in dests:
-            if dest in modules:
-                typ, _, state = modules[dest]
-                if typ == '&':
-                    state[src] = False
-
-    #print(modules)
 
     for _ in range(1000):
         queue = deque([('button', False, None)])
@@ -74,61 +77,33 @@ def a():
     return math.prod(counts.values())
 
 
-
-
-
-
-    pass
-
-
 def b():
-    modules = {}
-    counts = Counter()
-    modules['button'] = ('@', ['broadcaster'], None)
-    inputs = defaultdict(list)
-    for line in lines:
-        src, dests = line.split(' -> ')
-        dests = dests.split(', ')
-        if src[0] in '%&':
-            typ, src = src[0], src[1:]
-        else:
-            typ = '@'
-            state = None
-        if typ == '%':
-            state = [False]
-        elif typ == '&':
-            state = {}
-        modules[src] = (typ, dests, state)
-        for dest in dests:
-            inputs[dest].append(src)
-
     for name, (typ, _, state) in modules.items():
         if typ == '&':
             for src in inputs[name]:
                 state[src] = False
+        elif typ == '%':
+            state[0] = False
 
 
     # this only works for aoc inputs and not in general.
     # where we have &A -> rx
     # and a number of &B, &C, &D that hook up to &A directly.
     # these all cycle independently but there doesn't seem to be a fundamental reason why
-    to_watch = inputs[inputs['rx'][0]]
-    prev = {}
-    cycles = {}
+    to_watch = inputs[list(inputs['rx'])[0]]
+    cycles = []
 
+    queue = deque()
     for step in itertools.count(1):
-        queue = deque([('button', False, None)])
+        queue.appendleft(('button', False, None))
         while queue:
             (cur, pulse, src) = queue.pop()
-            if cur in to_watch:
+            if cur in to_watch and not pulse:
                 if pulse == False:
-                    if cur in prev:
-                        cycles[cur] = step-prev[cur]
-                    else:
-                        prev[cur] = step
-                if all(v in cycles for v in to_watch):
+                    cycles.append(step)
+                if len(cycles) == len(to_watch):
                     r = 1
-                    for v in cycles.values():
+                    for v in cycles:
                         r = u.lcm(r, v)
                     return r
 
@@ -148,9 +123,6 @@ def b():
             if npulse is not None:
                 for dest in dests:
                     queue.appendleft((dest, npulse, cur))
-                counts[npulse] += len(dests)
-    return math.prod(counts.values())
-    pass
 
 def main():
     submit = globals().get('submit', False)
