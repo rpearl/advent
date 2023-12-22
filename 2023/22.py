@@ -35,7 +35,7 @@ def sgn(x):
     assert False,x
 bricks = []
 occupied = set()
-for line in intlines:
+for i,line in enumerate(intlines):
     sx,sy,sz,ex,ey,ez = line
     dx = sgn(ex-sx)
     dy = sgn(ey-sy)
@@ -47,10 +47,12 @@ for line in intlines:
         cy += dy
         cz += dz
         brick.add((cx,cy,cz))
-    bricks.append(brick)
+    bricks.append((i,brick))
 
-for brick in bricks:
+for _,brick in bricks:
     occupied |= brick
+
+bricks.sort(key=lambda b: min(block[2] for block in b[1]))
 
 changed = True
 while changed:
@@ -58,7 +60,7 @@ while changed:
     #print()
     changed = False
     nbricks = []
-    for i,brick in enumerate(bricks):
+    for i,brick in bricks:
         nbrick = {(block[0], block[1], block[2]-1) for block in brick}
         occupied -= brick
         if all(block[2] >= 1 and block not in occupied for block in nbrick):
@@ -67,19 +69,20 @@ while changed:
         else:
             nbrick = brick
         occupied |= nbrick
-        nbricks.append(nbrick)
+        nbricks.append((i,nbrick))
     bricks = nbricks
 
+bricks.sort(key=lambda b: min(block[2] for block in b[1]))
 
 blockmap = {}
-for i,brick in enumerate(bricks):
+for i,brick in bricks:
     for block in brick:
         blockmap[block] = i
 
 supported_by = defaultdict(set)
 supporting = defaultdict(set)
 
-for i,brick in enumerate(bricks):
+for i,brick in bricks:
     topz = max(brick, key = lambda block: block[2])[2]
     top = {block for block in brick if block[2] == topz}
     for block in top:
@@ -91,7 +94,7 @@ for i,brick in enumerate(bricks):
 
 def a():
     s = 0
-    for i,brick in enumerate(bricks):
+    for i,brick in bricks:
         if all(len(supported_by[sb]) > 1 for sb in supporting[i]):
             s += 1
     return s
@@ -127,7 +130,7 @@ def b():
         return count
 
     s = 0
-    for i,brick in enumerate(bricks):
+    for i,brick in bricks:
         c = count_cascade(i)
         s += c
     return s
