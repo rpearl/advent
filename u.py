@@ -194,6 +194,12 @@ def all_neighbors(grid, p):
     yield from orthogonal(grid, p)
     yield from diagonal(grid, p)
 
+def det(v1, v2):
+    x1, y1 = v1
+    x2, y2 = v2
+    return x1*y2 - x2*y1
+
+
 
 def bfs(start, neighbors, is_done=None):
     pred = {}

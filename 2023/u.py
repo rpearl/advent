@@ -216,6 +216,29 @@ def bfs(start, neighbors, is_done=None):
             queue.append((child, node))
     return pred, dists
 
+def dfs(start, neighbors, prefn=None, postfn=None):
+    stack = [(start, False)]
+    visited = set()
+    while stack:
+        node, is_post = stack.pop()
+        if is_post and postfn is not None:
+            postfn(node)
+            continue
+        if node in visited:
+            continue
+        if prefn is not None:
+            prefn(node)
+        visited.add(node)
+        stack.append((node, True))
+        for child in neighbors(node):
+            if child not in visited:
+                stack.append((child, False))
+
+def toposort(start, neighbors):
+    order = deque()
+    dfs(start, neighbors, postfn=lambda node: order.appendleft(node))
+    return order
+
 
 def dijkstra(starts, neighbors, is_done=None):
     dist = defaultdict(lambda: math.inf)
