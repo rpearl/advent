@@ -11,7 +11,7 @@ import math
 import time
 import operator
 
-#data="""#.#####################
+_data="""#.#####################
 #.......#########...###
 #######.#########.#.###
 ###.....#.>.>.###.#.###
@@ -58,39 +58,43 @@ def a():
                 slopes.add((x,y))
 
     slopecons = {
-        '^': [u.S, u.N],
-        'v': [u.N, u.S],
-        '<': [u.E, u.W],
-        '>': [u.W, u.E],
+        '^': u.N,
+        'v': u.S,
+        '<': u.W,
+        '>': u.E,
     }
 
-    slopepoints = defaultdict(list)
-    for slope in slopes:
-        sc = slopecons[grid[slope]]
-        slopepoints[(slope[0] + sc[0][0], slope[1] + sc[0][1])].append((slope[0] + sc[1][0], slope[1] + sc[1][1]))
-
-    graph = defaultdict(list)
-
-    def connections_without_slope(pos):
-        for npos in u.orthogonal(grid, pos):
-            if grid[npos] == '.':
-                yield npos
+    def connections_to_slopes(cur, pos):
+        c = grid[pos]
+        if pos == cur and c != '.':
+            yield u.vadd(pos, slopecons[c])
+        elif c == '.':
+            yield from u.orthogonal(grid, pos)
+    graph = defaultdict(set)
 
     queue = deque([start])
+    seen = set()
     while queue:
         cur = queue.popleft()
-        _, dists = u.bfs(cur, connections_without_slope)
+        if cur in seen:
+            continue
+        seen.add(cur)
+        _, dists = u.bfs(cur, functools.partial(connections_to_slopes, cur))
         for p, w in dists.items():
-            if p in slopepoints:
-                graph[cur].extend((tgt, w+2) for tgt in slopepoints[p])
-                queue.extend(slopepoints[p])
-
+            if p in slopes:
+                d = slopecons[grid[p]]
+                pstart = u.vadd(p, u.opp[d])
+                pend = u.vadd(p, d)
+                if pstart in dists:
+                    graph[cur].add((p, w))
+                    queue.append(p)
             if p == end:
-                graph[cur].append((end, w))
+                graph[cur].add((end, w))
+
 
     def neighbors(pos):
         return [edge[0] for edge in graph[pos]]
-    order = u.toposort(start, neighbors)
+    order = u.toposort(start, lambda pos: (edge[0] for edge in graph[pos]))
 
     mdist = defaultdict(lambda: -math.inf)
     mdist[start] = 0
@@ -99,30 +103,6 @@ def a():
             if mdist[dst] < mdist[src] + w:
                 mdist[dst] = mdist[src] + w
     return mdist[end]
-
-
-
-
-
-    #def neighbors(pos):
-    #    for d in u.dirs:
-    #        npos = (pos[0] + d[0], pos[1] + d[1])
-    #        c = grid.get(npos)
-    #        if c == allowed[d] or c == '.':
-    #            yield npos
-
-    #@functools.cache
-    #def find_all_paths(source, target, so_far):
-    #    for node in neighbors(source):
-    #        if node == target:
-    #            yield len(so_far)
-    #        elif node not in so_far:
-    #            yield from find_all_paths(node, target, so_far | {node})
-    #return max(plen for plen in find_all_paths(start, end, frozenset({start})))
-
-
-
-    pass
 
 
 def b():
@@ -194,14 +174,14 @@ def b():
                 done = False
 
     graph = {k: v for k,v in graph.items() if len(v) > 0}
+    connected_to_end = {node: w for node, w in graph[end]}
 
     print(len(slopes))
     print(len(graph))
 
     def get_path_lengths(src, dst, path, total_w):
-        if src == dst:
-            #print(total_w)
-            yield total_w
+        if src in connected_to_end:
+            yield total_w + connected_to_end[src]
             return
         for node, w in graph[src]:
             if node not in path:

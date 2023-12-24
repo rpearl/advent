@@ -11,6 +11,9 @@ import heapq
 from aocd import submit as sbmt
 from parse import parse
 
+def vadd(v1, v2):
+    return (v1[0]+v2[0], v1[1] + v2[1])
+
 def fixparse(pattern, val):
     return parse(pattern, val).fixed
 
