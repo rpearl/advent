@@ -90,19 +90,19 @@ def b():
     stones = [u.lmap(tuple, u.chunks(line, 3)) for line in intlines]
     s = z3.Solver()
 
-    throw_x = z3.Int('x')
-    throw_y = z3.Int('y')
-    throw_z = z3.Int('z')
+    throw_x = z3.Real('x')
+    throw_y = z3.Real('y')
+    throw_z = z3.Real('z')
 
-    throw_vx = z3.Int('vx')
-    throw_vy = z3.Int('vy')
-    throw_vz = z3.Int('vz')
+    throw_vx = z3.Real('vx')
+    throw_vy = z3.Real('vy')
+    throw_vz = z3.Real('vz')
 
     # throw_x + throw_vx * t0 == p0 + 
 
-    for i,stone in enumerate(stones):
+    for i,stone in enumerate(stones[:3]):
         pos, vel = stone
-        t = z3.Int(f't{i}')
+        t = z3.Real(f't{i}')
         s.add(throw_x + throw_vx * t == pos[0] + vel[0] * t)
         s.add(throw_y + throw_vy * t == pos[1] + vel[1] * t)
         s.add(throw_z + throw_vz * t == pos[2] + vel[2] * t)
